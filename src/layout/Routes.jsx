@@ -69,6 +69,9 @@ import Login2b from "../components/Login/Login2b";
 import ShowTicketb from "../components/UserTicket/ShowTicketb";
 import Claimb from "../components/Claim/Claimb";
 import Notfound from "../components/Notfound/Notfound";
+import Recharge from "../components/Recharge/Recharge";
+import RechargeHome from "../components/Recharge/RechargeHome";
+import Agent from "../components/Login/Agent";
 
 export const router = createBrowserRouter([
   {
@@ -85,6 +88,11 @@ export const router = createBrowserRouter([
       {
         path: "/home",
         element: <Main></Main>,
+      },
+
+      {
+        path: "/recharge",
+        element: <RechargeHome></RechargeHome>,
       },
       {
         path: "/language",
@@ -277,6 +285,10 @@ export const router = createBrowserRouter([
       {
         path: "/admin",
         element: <Admin></Admin>,
+      },
+      {
+        path: "/agent",
+        element: <Agent></Agent>,
       },
       {
         path: "/driverSetting",

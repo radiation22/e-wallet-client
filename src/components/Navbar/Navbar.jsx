@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import { FaBell, FaChartLine, FaSearch, FaUser } from "react-icons/fa";
 import { FaGear, FaHandHoldingDollar, FaGift } from "react-icons/fa6";
 import { AuthContext } from "../context/AuthProvider";
@@ -15,6 +15,7 @@ import search from "../../assets/search.png";
 import bell from "../../assets/bell.png";
 import bus from "../../assets/bus1.png";
 import ticket2 from "../../assets/ticket2.png";
+import { useQuery } from "@tanstack/react-query";
 
 const Navbar = () => {
   const [notificationCount, setNotificationCount] = useState(0);
@@ -22,17 +23,48 @@ const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
 
   const [showDropdown, setShowDropdown] = useState(false);
+  const [balance, setBalance] = useState(0);
+  const [ticketCost, setTicketCost] = useState(0);
 
-  const dropdownRef = useRef(null);
+  // Define the query key
+  const queryKey = ["tickets", user?.email];
 
-  const handleSignOut = () => {
-    logOut()
-      .then((result) => {
-        toast.success("You have logged out");
-        navigate("/home");
-      })
-      .catch((error) => console.log(error));
-  };
+  // Use the useQuery hook to fetch data
+  const { data: tickets = [], refetch } = useQuery(
+    queryKey,
+    async () => {
+      const url = `https://e-wallet-server.vercel.app/myTicket?email=${user?.email}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      return data;
+    },
+    {
+      enabled: !!user?.email, // Only fetch data when user.email is available
+    }
+  );
+
+  // Calculate the total cost from the tickets data and update the state
+  useEffect(() => {
+    const totalTicketCost = tickets.reduce(
+      (total, ticket) => total + ticket.totalCost,
+      0
+    );
+
+    // Update the ticketCost state with the calculated total cost
+    setTicketCost(totalTicketCost);
+    refetch();
+  }, [tickets, ticketCost]);
+
+  useEffect(() => {
+    const url = `https://e-wallet-server.vercel.app/myBalance?email=${user?.email}`;
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        const balance = data.map((bal) => setBalance(bal?.balance));
+        refetch();
+      });
+  }, [user?.email]);
 
   const handleNotificationClick = () => {
     setNotificationCount(0);
@@ -42,21 +74,16 @@ const Navbar = () => {
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
+  const [isBalanceVisible, setIsBalanceVisible] = useState(false);
 
-  const closeDropdown = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setShowDropdown(false);
-    }
-  };
-
-  const showTicket = () => {
-    navigate("/myTicket");
+  const toggleBalanceVisibility = () => {
+    setIsBalanceVisible(!isBalanceVisible);
   };
 
   return (
     <>
       <header className="bg-[#04A83F] w-full px-3 text-white pt-1">
-        <div className="container mx-auto flex items-center">
+        <div className="container mx-auto flex items-center justify-between">
           <div className="flex">
             {/* Add the user icon */}
             <div className="mr-4">
@@ -67,8 +94,19 @@ const Navbar = () => {
               <img className="h-6" src={search} alt="" />
             </div>
           </div>
-          <div className="flex-grow relative"></div>
+
           <div className="ml-4 flex items-center">
+            <div>
+              <input
+                readOnly
+                className="text-black text-center rounded-full ps-3 outline outline-yellow-400 mr-3 cursor-pointer"
+                onClick={toggleBalanceVisibility}
+                value={
+                  isBalanceVisible ? `${balance - ticketCost} BDT` : "Balance"
+                }
+                type="text"
+              />
+            </div>
             <button className="mr-4" onClick={handleNotificationClick}>
               <div className="relative">
                 <img className="h-6" src={bell} alt="" />
@@ -92,19 +130,6 @@ const Navbar = () => {
                   alt=""
                 />
               </Link>
-              {/* {showDropdown && (
-                <div
-                  className="absolute w-[80px] top-10 right-0 bg-rose-400 border shadow-lg rounded-md"
-                  ref={dropdownRef}
-                >
-                  <button
-                    onClick={handleSignOut}
-                    className="block w-full px-2 py-1 text-left hover:bg-red-500 hover:text-white"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              )} */}
             </div>
           </div>
         </div>

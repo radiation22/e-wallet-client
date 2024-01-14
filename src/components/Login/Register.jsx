@@ -25,8 +25,18 @@ const Register = () => {
   const from = location.state?.from?.pathname || "/";
   const { createUser, updateUserProfile, signIn } = useContext(AuthContext);
   const [selectedCity, setSelectedCity] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumberError, setPhoneNumberError] = useState("");
 
-  const [showPopup, setShowPopup] = useState(false);
+  const validatePhoneNumber = (phoneNumber) => {
+    if (phoneNumber.length === 11) {
+      setPhoneNumberError(""); // No error
+      return true;
+    } else {
+      setPhoneNumberError("Phone number must be 11 characters");
+      return false;
+    }
+  };
 
   const handleCityChange = (e) => {
     const selectedValue = e.target.value;
@@ -76,7 +86,7 @@ const Register = () => {
       }
     } catch (error) {
       // Handle any errors that occurred during the fetch
-      console.error("Error uploading image:", error);
+      setLoginError("Error uploading image:", error);
       throw error;
     }
   };
@@ -90,14 +100,33 @@ const Register = () => {
       const user = result.user;
 
       await handleUpdateUser(data.name, data.email, imageUrl, selectedCity);
+      saveUser(data.name, data.email, 0, phoneNumber);
 
       toast.success("Successfully registered");
       navigate("/location");
     } catch (error) {
-      console.error("Image upload or user creation failed:", error);
+      setLoginError("Image upload or user creation failed:", error);
     } finally {
       setIsSignUpLoading(false); // Set loading to false when the sign-up process is complete
     }
+  };
+
+  const saveUser = (name, email, balance, phoneNumber) => {
+    const user = { name, email, balance, phoneNumber };
+    fetch("https://e-wallet-server.vercel.app/addUsers", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(user),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (loading) {
+          return <Loader></Loader>;
+        }
+        setCreatedUserEmail(email);
+      });
   };
 
   const handleUpdateUser = async (name, email, photoURL, city) => {
@@ -112,7 +141,7 @@ const Register = () => {
     try {
       await updateUserProfile(profile);
     } catch (error) {
-      console.error("Error updating user profile:", error);
+      setLoginError("Error updating user profile:", error);
     }
   };
 
@@ -196,6 +225,25 @@ const Register = () => {
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
                   <FaLock className="text-[#A7B4C2] ml-3"></FaLock>
                 </span>
+              </div>
+              <div>
+                <input
+                  {...register("phoneNumber")}
+                  type="tel"
+                  name="phoneNumber"
+                  id="phoneNumber"
+                  required
+                  placeholder="   Enter Your Phone Number"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  onBlur={() => validatePhoneNumber(phoneNumber)}
+                  className={`w-full pl-10 py-3 drop-shadow-xl border-2 rounded-full border-[#54B89C] focus:outline-green-500 text-gray-900 ${
+                    phoneNumberError ? "border-red-500" : ""
+                  }`}
+                />
+                {phoneNumberError && (
+                  <p className="text-red-500">{phoneNumberError}</p>
+                )}
               </div>
               <div>
                 <div>

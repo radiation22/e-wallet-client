@@ -5,14 +5,15 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBjoyHAtzhz6UZ44bHqoDRJMruA1fdOvDo",
-  authDomain: "nirapode-bd7eb.firebaseapp.com",
-  projectId: "nirapode-bd7eb",
-  storageBucket: "nirapode-bd7eb.appspot.com",
-  messagingSenderId: "1057579763819",
-  appId: "1:1057579763819:web:686433caa47d57ab91892e",
+  apiKey: "AIzaSyBuIDIt-i6fYO_UZQ9ajxJvSQKtVFefC1Y",
+  authDomain: "e-wallet-2538d.firebaseapp.com",
+  projectId: "e-wallet-2538d",
+  storageBucket: "e-wallet-2538d.appspot.com",
+  messagingSenderId: "955482121085",
+  appId: "1:955482121085:web:d67616dcde5d98755da214",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
 export default app;
