@@ -4,13 +4,7 @@ import { FaGear, FaHandHoldingDollar, FaGift } from "react-icons/fa6";
 import { AuthContext } from "../context/AuthProvider";
 import { toast } from "react-hot-toast";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import ticket from "../../assets/ticket.png";
-import reward from "../../assets/reward.png";
-import reward2 from "../../assets/gift2.png";
-import donate from "../../assets/donate.png";
-import donate2 from "../../assets/donate2.png";
-import more from "../../assets/more.png";
-import more2 from "../../assets/moreactive.png";
+
 import search from "../../assets/search.png";
 import bell from "../../assets/bell.png";
 import bus from "../../assets/bus1.png";
